@@ -1,4 +1,13 @@
 export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end()
+    return
+  }
+
   const cuenta = 'carrefourar'
   const dominio = 'vtexcommercestable.com.br'
   const pedido = req.query.query || 'remera'
@@ -22,4 +31,3 @@ export default async function handler(req, res) {
     res.status(500).json({ error: error.message })
   }
 }
-
