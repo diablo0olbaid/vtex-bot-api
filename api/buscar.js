@@ -21,9 +21,11 @@ export default async function handler(req, res) {
     }
 
     const data = await response.json()
+
     const primeros = data.slice(0, 3).map(p => ({
       nombre: p.productName,
-      link: `https://${cuenta}.${dominio}/${p.linkText}/p`
+      link: `https://${cuenta}.${dominio}/${p.linkText}/p`,
+      imagen: p.items[0]?.images[0]?.imageUrl || '',
     }))
 
     res.status(200).json({ productos: primeros })
