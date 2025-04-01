@@ -22,13 +22,19 @@ export default async function handler(req, res) {
 
     const data = await response.json()
 
-    const primeros = data.slice(0, 3).map(p => ({
-      nombre: p.productName,
-      link: `https://${cuenta}.${dominio}/${p.linkText}/p`,
-      imagen: p.items[0]?.images[0]?.imageUrl || '',
-    }))
+    const primeros = data.slice(0, 3).map(p => {
+      const sku = p.items?.[0]?.itemId || null
+
+      return {
+        nombre: p.productName,
+        link: `https://${cuenta}.${dominio}/${p.linkText}/p`,
+        imagen: p.items?.[0]?.images?.[0]?.imageUrl || '',
+        sku // 👈 ahora lo devolvés
+      }
+    })
 
     res.status(200).json({ productos: primeros })
+
   } catch (error) {
     res.status(500).json({ error: error.message })
   }
