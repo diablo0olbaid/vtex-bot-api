@@ -26,9 +26,13 @@ export default async function handler(req, res) {
     const productosFiltrados = data
       .map(p => {
         const item = p.items?.[0]
-        const seller = item?.sellers?.find(s => !sellerId || s.sellerId === sellerId)
+        if (!item || !item.sellers) return null
 
-        if (!item || !seller) return null
+        const seller = item.sellers.find(s => {
+          return sellerId && s.sellerId === sellerId && s.commertialOffer?.AvailableQuantity > 0
+        })
+
+        if (!seller) return null
 
         return {
           nombre: p.productName,
