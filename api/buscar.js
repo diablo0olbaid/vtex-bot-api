@@ -22,30 +22,18 @@ export default async function handler(req, res) {
 
     const data = await response.json()
 
-    // Filtrar productos con descuento real (Price < ListPrice)
-    const productosEnPromo = data
-      .map(p => {
-        const item = p.items?.[0]
-        const seller = item?.sellers?.[0]
-        const offer = seller?.commertialOffer
+    const primeros = data.slice(0, 3).map(p => {
+      const sku = p.items?.[0]?.itemId || null
 
-        const tieneDescuento = offer && offer.Price < offer.ListPrice
+      return {
+        nombre: p.productName,
+        link: `https://${cuenta}.${dominio}/${p.linkText}/p`,
+        imagen: p.items?.[0]?.images?.[0]?.imageUrl || '',
+        sku
+      }
+    })
 
-        if (!tieneDescuento) return null
-
-        return {
-          nombre: p.productName,
-          link: `https://${cuenta}.${dominio}/${p.linkText}/p`,
-          imagen: item?.images?.[0]?.imageUrl || '',
-          sku: item?.itemId,
-          precioAnterior: offer.ListPrice,
-          precioActual: offer.Price
-        }
-      })
-      .filter(p => p !== null)
-      .slice(0, 10) // limitar a 10 promos
-
-    res.status(200).json({ productos: productosEnPromo })
+    res.status(200).json({ productos: primeros })
 
   } catch (error) {
     res.status(500).json({ error: error.message })
