@@ -22,30 +22,49 @@ export default async function handler(req, res) {
 
     const data = await response.json()
 
-    // Filtrar productos con descuento real (Price < ListPrice)
-    const productosEnPromo = data
+    // Buscar promos por Price < ListPrice o presence of priceTags
+    const posiblesPromos = data
       .map(p => {
         const item = p.items?.[0]
         const seller = item?.sellers?.[0]
         const offer = seller?.commertialOffer
 
-        const tieneDescuento = offer && offer.Price < offer.ListPrice
+        const tieneDescuento = offer?.Price < offer?.ListPrice
+        const tienePriceTag = offer?.PriceTags?.length > 0
 
-        if (!tieneDescuento) return null
+        if (!tieneDescuento && !tienePriceTag) return null
 
         return {
           nombre: p.productName,
           link: `https://${cuenta}.${dominio}/${p.linkText}/p`,
           imagen: item?.images?.[0]?.imageUrl || '',
           sku: item?.itemId,
-          precioAnterior: offer.ListPrice,
-          precioActual: offer.Price
+          precioAnterior: offer?.ListPrice,
+          precioActual: offer?.Price
         }
       })
       .filter(p => p !== null)
-      .slice(0, 10) // limitar a 10 promos
 
-    res.status(200).json({ productos: productosEnPromo })
+    // Si no encontramos promos, devolver 5 productos normales
+    const fallback = data.slice(0, 5).map(p => {
+      const item = p.items?.[0]
+      const seller = item?.sellers?.[0]
+      const offer = seller?.commertialOffer
+
+      return {
+        nombre: p.productName,
+        link: `https://${cuenta}.${dominio}/${p.linkText}/p`,
+        imagen: item?.images?.[0]?.imageUrl || '',
+        sku: item?.itemId,
+        precioAnterior: offer?.ListPrice,
+        precioActual: offer?.Price,
+        sinPromo: true
+      }
+    })
+
+    const resultadoFinal = posiblesPromos.length > 0 ? posiblesPromos.slice(0, 10) : fallback
+
+    res.status(200).json({ productos: resultadoFinal })
 
   } catch (error) {
     res.status(500).json({ error: error.message })
