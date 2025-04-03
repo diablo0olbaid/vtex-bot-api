@@ -24,17 +24,18 @@ export default async function handler(req, res) {
 
     const primeros = data.slice(0, 3).map(p => {
       const sku = p.items?.[0]?.itemId || null
+      const precio = p.items?.[0]?.sellers?.[0]?.commertialOffer?.Price || null
 
       return {
         nombre: p.productName,
         link: `https://${cuenta}.${dominio}/${p.linkText}/p`,
         imagen: p.items?.[0]?.images?.[0]?.imageUrl || '',
-        sku
+        sku,
+        precio
       }
     })
 
     res.status(200).json({ productos: primeros })
-
   } catch (error) {
     res.status(500).json({ error: error.message })
   }
