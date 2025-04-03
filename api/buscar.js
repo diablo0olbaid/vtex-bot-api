@@ -24,14 +24,15 @@ export default async function handler(req, res) {
 
     const primeros = data.slice(0, 3).map(p => {
       const sku = p.items?.[0]?.itemId || null
-      const precio = p.items?.[0]?.sellers?.[0]?.commertialOffer?.Price || null
+      const offer = p.items?.[0]?.sellers?.[0]?.commertialOffer || {}
 
       return {
         nombre: p.productName,
         link: `https://${cuenta}.${dominio}/${p.linkText}/p`,
         imagen: p.items?.[0]?.images?.[0]?.imageUrl || '',
         sku,
-        precio
+        precio: offer.Price || null,
+        precioAnterior: offer.ListPrice || null
       }
     })
 
