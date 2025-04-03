@@ -22,17 +22,30 @@ export default async function handler(req, res) {
         messages: [
           {
             role: 'user',
-            content: `Clasificá esta frase del usuario en una de estas categorías:
+            content: `
+Quiero que actúes como un clasificador de intención de usuario.
 
+Tu tarea es leer la frase y clasificarla en solo una de estas categorías:
+
+- saludo
 - agregar_producto
 - finalizar_carrito
 - consultar_promocion
-- saludo
 - otro
 
-Frase: "${mensaje}"
+Ejemplos:
+- "hola" → saludo
+- "holaa" → saludo
+- "quiero sumar algo más" → agregar_producto
+- "ya está, pasame el link" → finalizar_carrito
+- "qué promos hay?" → consultar_promocion
+- "cómo te llamás?" → otro
 
-Respuesta (solo una palabra):`
+Ahora clasificá esta frase:
+"${mensaje}"
+
+Respuesta (solo una palabra):
+`
           }
         ],
         temperature: 0.1,
